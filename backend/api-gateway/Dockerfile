@@ -1,15 +1,15 @@
 FROM node:20-alpine
-
-# 1. Definimos el directorio de trabajo
 WORKDIR /app
-
-# 2. Le damos la propiedad de la carpeta al usuario seguro 'node'
 RUN chown -R node:node /app
-
-# 3. Cambiamos al usuario sin privilegios antes de ejecutar la aplicación
 USER node
 
-# Archivo temporal para simular la aplicación mientras escribimos el código real
-RUN echo "console.log('Omnipay API Gateway Bootstrapped!');" > main.js
+# Creamos un servidor HTTP básico para que el contenedor se mantenga vivo
+RUN echo "const http = require('http'); \
+const server = http.createServer((req, res) => { \
+  res.writeHead(200, {'Content-Type': 'application/json'}); \
+  res.end(JSON.stringify({ status: 'OK', service: 'Omnipay API Gateway' })); \
+}); \
+server.listen(3000, () => console.log('Gateway listening on port 3000'));" > main.js
 
+EXPOSE 3000
 CMD ["node", "main.js"]
